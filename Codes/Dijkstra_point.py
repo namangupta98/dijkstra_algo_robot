@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
 import math
-from Queue import PriorityQueue
+from queue import PriorityQueue
+import time
+
 
 # obstacle = 1
 
@@ -17,11 +19,12 @@ def square_obstacle(x, y, length, w):
 
 
 def circle_obstacle(x, y, a, b, radius, w):
-    for j in range(x - a*radius, x + a*radius):
-        for i in range(y - b*radius, y + b*radius):
-            val = float(j - x)**2/a**2 + float(i - y) ** 2/b**2
-            if float(j - x)**2/a**2 + float(i - y) ** 2/b**2 <= radius**2:
+    for j in range(x - a * radius, x + a * radius):
+        for i in range(y - b * radius, y + b * radius):
+            val = float(j - x) ** 2 / a ** 2 + float(i - y) ** 2 / b ** 2
+            if float(j - x) ** 2 / a ** 2 + float(i - y) ** 2 / b ** 2 <= radius ** 2:
                 w[i][j] = 0
+
 
 '''
 Input lines contains:
@@ -30,6 +33,8 @@ lines[3] - defines which part of the half plane should be included in the obstac
 			0: Include negative half plane
 			1: Include positive half plane
 '''
+
+
 def obstacle(lines, xmin, xmax, ymin, ymax, w):
     for i in range(ymin, ymax + 1):
         for j in range(xmin, xmax + 1):
@@ -51,17 +56,19 @@ def obstacle(lines, xmin, xmax, ymin, ymax, w):
                         w[i][j] = 1
                         break
 
+
 def getLineParam(x1, y1, x2, y2):
-    if x2 - x1 ==0:
+    if x2 - x1 == 0:
         return 1, 0, -x1
     else:
-        a = float(y2 - y1)/float(x2 - x1)
+        a = float(y2 - y1) / float(x2 - x1)
     b = -1
     c = y1 - a * x1
 
     # print(a)
 
     return -a, -b, -c
+
 
 def getMap(World):
     # World = world(200, 300)
@@ -84,7 +91,7 @@ def getMap(World):
         lines.append(l)
 
     lines = np.asarray(lines)
-    print(lines.shape)
+    # print(lines.shape)
 
     # Get obstacles for world
     obstacle(lines, 200, 250, 10, 40, World)
@@ -148,10 +155,6 @@ def getMap(World):
 
     obstacle(lines1, 31, 100, 30, 77, World)
 
-    # cv2.imshow("World", World)
-    # if cv2.waitKey(0) & 0xff == 27:
-    #     cv2.destroyAllWindows()
-
 
 # function to get start points
 def startPoint():
@@ -171,36 +174,35 @@ def goalPoint():
     return gx, gy
 
 
-# function to determine minimum cost
-# def minCost(costs, node):
-#     x, y = node
-#
-#     if
-#     pass
-
 # function to get cost of every move
 def getCostOfMove(cur, i, j):
     x, y = cur
-
-    return math.sqrt((x-i)**2 + (y-j)**2)
-
+    return math.sqrt((x - i) ** 2 + (y - j) ** 2)
 
 
 # function to explore neighbors and lot more
-def explorer(costs, c_pq, paren):
-
+def explorer(costs, c_pq):
     while not c_pq.empty():
         top = c_pq.get()
-        x, y =top[0]
-        for i in range(x-1, x+2):
-            for j in range(y-1, y+2):
-                if i >=0 and i < 200 and j >=0 and j < 300:
-                    if w[i, j] == 1 and top[0] != (i,j):
+        x, y = top[0]
+        for i in range(x - 1, x + 2):
+            for j in range(y - 1, y + 2):
+                if 0 <= i < 200 and 0 <= j < 300:
+                    if w[i, j] == 1 and top[0] != (i, j):
                         temp_cost = costs[top[0]] + getCostOfMove(top[0], i, j)
                         if temp_cost < costs[i, j]:
-                            c_pq.put(((i,j), temp_cost))
-                            paren[i, j, :] = [top[0][0], top[0][1]]
+                            c_pq.put(((i, j), temp_cost))
+                            parent[i, j, :] = [top[0][0], top[0][1]]
                             costs[i][j] = temp_cost
+
+
+# function to backtrace the path
+def backtrace(node):
+    if not parent[node]:
+        return path
+    else:
+        path.append(parent[node])
+        return backtrace(parent[node])
 
     # costs.put(((x-1, y), 1))
     # parent[x-1, y] = node
@@ -257,6 +259,7 @@ def explorer(costs, c_pq, paren):
     # node =
     # return explorer(costs, paren, )
 
+
 # function for the sake of algo
 # def dijkstra(costs, c_pq, paren, node, goal):
 #     costs.put(((node), 0))
@@ -272,6 +275,9 @@ def explorer(costs, c_pq, paren):
 # main function
 if __name__ == '__main__':
 
+    # start timer
+    t = time.time()
+
     w = world(200, 300)
     getMap(w)
 
@@ -283,6 +289,7 @@ if __name__ == '__main__':
     # world = np.zeros(100)
 
     # Get points
+    path = []
     start_point = startPoint()
     goal_point = goalPoint()
 
@@ -297,9 +304,18 @@ if __name__ == '__main__':
             cost[i, j] = float('inf')
 
     cost[start_point] = 0
-    cost_pq.put(((start_point), 0))
+    cost_pq.put((start_point, 0))
 
-    explorer(cost, cost_pq, parent)
+    # let's explore
+    explorer(cost, cost_pq)
+    print(parent)
 
-    print(cost)
+    # get final path
+    path.append(goal_point)
+    temp_path = backtrace(goal_point)
+    print(temp_path)
 
+    # stop timer
+    temp_t = t
+    t = time.time()
+    print('Total Time: ', t - temp_t, 'sec')
