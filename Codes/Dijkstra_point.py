@@ -3,7 +3,7 @@ import numpy as np
 import math
 from Queue import PriorityQueue
 
-obstacle = 1
+# obstacle = 1
 
 def world(length, breadth):
     w = np.ones((length, breadth))
@@ -64,7 +64,7 @@ def getLineParam(x1, y1, x2, y2):
     return -a, -b, -c
 
 def getMap(World):
-    World = world(200, 300)
+    # World = world(200, 300)
 
     points = [[200, 25, 225, 40, 0],
               [250, 25, 225, 40, 0],
@@ -155,15 +155,19 @@ def getMap(World):
 
 # function to get start points
 def startPoint():
-    sx = int(input('Enter x coordinate for start point: '))
-    sy = int(input('Enter y coordinate for start point: '))
+    # sx = int(input('Enter x coordinate for start point: '))
+    # sy = int(input('Enter y coordinate for start point: '))
+    sx = 5
+    sy = 5
     return sx, sy
 
 
 # function to get goal points
 def goalPoint():
-    gx = int(input('Enter x coordinate for goal point: '))
-    gy = int(input('Enter y coordinate for goal point: '))
+    # gx = int(input('Enter x coordinate for goal point: '))
+    # gy = int(input('Enter y coordinate for goal point: '))
+    gx = 195
+    gy = 295
     return gx, gy
 
 
@@ -188,14 +192,15 @@ def explorer(costs, c_pq, paren):
     while not c_pq.empty():
         top = c_pq.get()
         x, y =top[0]
-        for i in (x-1, x+2):
-            for j in (y-1, y+2):
-                if w[i, j] != 1 and top[0] != (i,j):
-                    temp_cost = costs[top[0]] + getCostOfMove(top[0], i, j)
-                    if temp_cost < costs[i, j]:
-                        c_pq.put(((i,j), temp_cost))
-                        paren[i, j] = top[0]
-                        costs[i][j] = temp_cost
+        for i in range(x-1, x+2):
+            for j in range(y-1, y+2):
+                if i >=0 and i < 200 and j >=0 and j < 300:
+                    if w[i, j] == 1 and top[0] != (i,j):
+                        temp_cost = costs[top[0]] + getCostOfMove(top[0], i, j)
+                        if temp_cost < costs[i, j]:
+                            c_pq.put(((i,j), temp_cost))
+                            paren[i, j, :] = [top[0][0], top[0][1]]
+                            costs[i][j] = temp_cost
 
     # costs.put(((x-1, y), 1))
     # parent[x-1, y] = node
@@ -270,9 +275,9 @@ if __name__ == '__main__':
     w = world(200, 300)
     getMap(w)
 
-    cv2.imshow("World", w)
-    if cv2.waitKey(0) & 0xff == 27:
-        cv2.destroyAllWindows()
+    # cv2.imshow("World", w)
+    # if cv2.waitKey(0) & 0xff == 27:
+    #     cv2.destroyAllWindows()
 
     # world map
     # world = np.zeros(100)
@@ -283,12 +288,12 @@ if __name__ == '__main__':
 
     # Arrays for cost, parent
     cost_pq = PriorityQueue()
-    parent = np.empty_like(w)
+    parent = np.zeros((200, 300, 2))
     cost = np.empty_like(w)
 
     for i in range(w.shape[0]):
         for j in range(w.shape[1]):
-            parent[i, j] = None
+            parent[i, j, :] = [0, 0]
             cost[i, j] = float('inf')
 
     cost[start_point] = 0
