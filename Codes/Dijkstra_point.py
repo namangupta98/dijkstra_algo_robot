@@ -192,84 +192,21 @@ def explorer(costs, c_pq):
                         temp_cost = costs[top[0]] + getCostOfMove(top[0], i, j)
                         if temp_cost < costs[i, j]:
                             c_pq.put(((i, j), temp_cost))
-                            parent[i, j, :] = [top[0][0], top[0][1]]
+                            x1 = int(top[0][0])
+                            y1 = int(top[0][1])
+                            parent[i, j, :] = [x1, y1]
                             costs[i][j] = temp_cost
 
 
 # function to backtrace the path
-def backtrace(node):
-    if not parent[node]:
+def backtrace(x, y):
+    print(x, y)
+    # print(parent[x, y, :])
+    if parent[int(x), int(y), 0] == -1:
         return path
     else:
-        path.append(parent[node])
-        return backtrace(parent[node])
-
-    # costs.put(((x-1, y), 1))
-    # parent[x-1, y] = node
-    # # move down
-    # if world[x + 1, y] == 1:
-    #     pass
-    # else:
-    #     costs.put(((x + 1, y), 1))
-    #     parent[x + 1, y] = node
-    #
-    # # move left
-    # if world[x, y-1] == 1:
-    #     pass
-    # else:
-    #     costs.put(((x, y-1), 1))
-    #     parent[x, y-1] = node
-    #
-    # # move right
-    # if world[x, y+1] == 1:
-    #     pass
-    # else:
-    #     costs.put(((x, y+1), 1))
-    #     parent[x, y+1] = node
-    #
-    # # move top-left
-    # if world[x-1, y-1] == 1:
-    #     pass
-    # else:
-    #     costs.put(((x-1, y-1), math.sqrt(2)))
-    #     parent[x-1, y-1] = node
-    #
-    # # move top-right
-    # if world[x-1, y+1] == 1:
-    #     pass
-    # else:
-    #     costs.put(((x-1, y+1), math.sqrt(2)))
-    #     parent[x-1, y+1] = node
-    #
-    # # move bottom-left
-    # if world[x + 1, y-1] == 1:
-    #     pass
-    # else:
-    #     costs.put(((x + 1, y-1), math.sqrt(2)))
-    #     parent[x + 1, y-1] = node
-    #
-    # # move bottom-right
-    # if world[x - 1, y+1] == 1:
-    #     pass
-    # else:
-    #     costs.put(((x - 1, y+1), 1))
-    #     parent[x-1, y+1] = node
-    # costs.
-    # new_node = costs.get()
-    # node =
-    # return explorer(costs, paren, )
-
-
-# function for the sake of algo
-# def dijkstra(costs, c_pq, paren, node, goal):
-#     costs.put(((node), 0))
-#
-#     if node == goal:
-#         return #TODO: pata nhi
-#     else:
-#
-#         # let's explore neighbors
-#         explorer(costs, c_pq, paren, node, goal)
+        path.append(parent[x, y, :])
+        return backtrace(int(parent[x, y, 0]), int(parent[x, y, 1]))
 
 
 # main function
@@ -300,7 +237,7 @@ if __name__ == '__main__':
 
     for i in range(w.shape[0]):
         for j in range(w.shape[1]):
-            parent[i, j, :] = [0, 0]
+            parent[i, j, :] = [-1, -1]
             cost[i, j] = float('inf')
 
     cost[start_point] = 0
@@ -308,11 +245,11 @@ if __name__ == '__main__':
 
     # let's explore
     explorer(cost, cost_pq)
-    print(parent)
+    # print(parent)
 
     # get final path
     path.append(goal_point)
-    temp_path = backtrace(goal_point)
+    temp_path = backtrace(goal_point[0], goal_point[1])
     print(temp_path)
 
     # stop timer
