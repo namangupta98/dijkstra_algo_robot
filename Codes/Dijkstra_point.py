@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import math
-from queue import PriorityQueue
+from Queue import PriorityQueue
 
 obstacle = 1
 
@@ -168,25 +168,34 @@ def goalPoint():
 
 
 # function to determine minimum cost
-def minCost(costs, node):
-    x, y = node
+# def minCost(costs, node):
+#     x, y = node
+#
+#     if
+#     pass
 
-    if
-    pass
+# function to get cost of every move
+def getCostOfMove(cur, i, j):
+    x, y = cur
+
+    return math.sqrt((x-i)**2 + (y-j)**2)
+
 
 
 # function to explore neighbors and lot more
-def explorer(costs, c_pq, paren, node, goal):
-    x, y = node
+def explorer(costs, c_pq, paren):
 
     while not c_pq.empty():
         top = c_pq.get()
+        x, y =top[0]
         for i in (x-1, x+2):
             for j in (y-1, y+2):
-                if world[i, j] == 1:
-                    break
-                else:
-                    if costs[top[0]] + costs[i, j] <                     
+                if w[i, j] != 1 and top[0] != (i,j):
+                    temp_cost = costs[top[0]] + getCostOfMove(top[0], i, j)
+                    if temp_cost < costs[i, j]:
+                        c_pq.put(((i,j), temp_cost))
+                        paren[i, j] = top[0]
+                        costs[i][j] = temp_cost
 
     # costs.put(((x-1, y), 1))
     # parent[x-1, y] = node
@@ -238,35 +247,35 @@ def explorer(costs, c_pq, paren, node, goal):
     # else:
     #     costs.put(((x - 1, y+1), 1))
     #     parent[x-1, y+1] = node
-    costs.
-    new_node = costs.get()
-    node =
-    return explorer(costs, paren, )
+    # costs.
+    # new_node = costs.get()
+    # node =
+    # return explorer(costs, paren, )
 
 # function for the sake of algo
-def dijkstra(costs, c_pq, paren, node, goal):
-    costs.put(((node), 0))
-
-    if node == goal:
-        return #TODO: pata nhi
-    else:
-
-        # let's explore neighbors
-        explorer(costs, c_pq, paren, node, goal)
+# def dijkstra(costs, c_pq, paren, node, goal):
+#     costs.put(((node), 0))
+#
+#     if node == goal:
+#         return #TODO: pata nhi
+#     else:
+#
+#         # let's explore neighbors
+#         explorer(costs, c_pq, paren, node, goal)
 
 
 # main function
 if __name__ == '__main__':
 
-    world = world(200, 300)
-    getMap(world)
+    w = world(200, 300)
+    getMap(w)
 
-    cv2.imshow("World", World)
+    cv2.imshow("World", w)
     if cv2.waitKey(0) & 0xff == 27:
         cv2.destroyAllWindows()
 
     # world map
-    world = np.zeros(100)
+    # world = np.zeros(100)
 
     # Get points
     start_point = startPoint()
@@ -274,13 +283,18 @@ if __name__ == '__main__':
 
     # Arrays for cost, parent
     cost_pq = PriorityQueue()
-    parent = np.empty_like(world)
-    cost = np.empty_like(world)
+    parent = np.empty_like(w)
+    cost = np.empty_like(w)
 
-    for i in range(world.shape[0]):
-        for j in range(world.shape[1]):
+    for i in range(w.shape[0]):
+        for j in range(w.shape[1]):
             parent[i, j] = None
             cost[i, j] = float('inf')
 
-    dijkstra(cost, cost_pq, parent, start_point, goal_point)
+    cost[start_point] = 0
+    cost_pq.put(((start_point), 0))
+
+    explorer(cost, cost_pq, parent)
+
+    print(cost)
 
