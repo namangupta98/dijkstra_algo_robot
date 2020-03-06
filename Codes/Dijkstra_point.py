@@ -250,15 +250,21 @@ if __name__ == '__main__':
 
     rgb_w = cv2.cvtColor(w, cv2.COLOR_GRAY2RGB)
 
+    count = 1
     for exp in explored:
-        cv2.circle(rgb_w, (int(exp[1]), int(exp[0])), 1, (0, 255, 0))
+        count = count + 1
+        # cv2.circle(rgb_w, (int(exp[1]), int(exp[0])), 1, (0, 255, 0))
+        rgb_w[int(exp[0]), int(exp[1]), :] = [0, 255, 0]
         cv2.imshow("Explored region", rgb_w)
         cv2.waitKey(1)
+        if count == len(explored):
+            cv2.destroyAllWindows()
 
     count = 1
     for cord in temp_path:
         count = count + 1
-        cv2.circle(rgb_w, (int(cord[1]), int(cord[0])), 1, (255, 0, 0))
+        # cv2.circle(rgb_w, (int(cord[1]), int(cord[0])), 1, (255, 0, 0))
+        rgb_w[int(cord[0]), int(cord[1]), :] = [255, 0, 0]
         cv2.imshow("Final Path", rgb_w)
         if count == len(temp_path):
             if cv2.waitKey(0) & 0xff == 27:
