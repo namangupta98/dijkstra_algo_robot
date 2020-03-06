@@ -215,6 +215,7 @@ if __name__ == '__main__':
     # start timer
     t = time.time()
 
+    # generate world with obstacles
     w = world(200, 300)
     getMap(w)
 
