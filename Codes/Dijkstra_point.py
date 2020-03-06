@@ -1,11 +1,9 @@
 import cv2
 import numpy as np
 import math
-from Queue import PriorityQueue
+from queue import PriorityQueue
 import time
 
-
-# obstacle = 1
 
 def world(length, breadth):
     w = np.ones((length, breadth))
@@ -71,6 +69,7 @@ def getLineParam(x1, y1, x2, y2):
 
 
 def getMap(World):
+
     points = [[200, 25, 225, 40, 0],
               [250, 25, 225, 40, 0],
               [250, 25, 225, 10, 1],
@@ -152,19 +151,19 @@ def getMap(World):
 
 # function to get start points
 def startPoint():
-    # sx = int(input('Enter x coordinate for start point: '))
-    # sy = int(input('Enter y coordinate for start point: '))
-    sx = 5
-    sy = 5
+    sx = int(input('Enter x coordinate for start point: '))
+    sy = int(input('Enter y coordinate for start point: '))
+    # sx = 5
+    # sy = 5
     return sx, sy
 
 
 # function to get goal points
 def goalPoint():
-    # gx = int(input('Enter x coordinate for goal point: '))
-    # gy = int(input('Enter y coordinate for goal point: '))
-    gx = 195
-    gy = 295
+    gx = int(input('Enter x coordinate for goal point: '))
+    gy = int(input('Enter y coordinate for goal point: '))
+    # gx = 195
+    # gy = 295
     return gx, gy
 
 
@@ -214,14 +213,13 @@ if __name__ == '__main__':
     w = world(200, 300)
     getMap(w)
 
-    # cv2.imshow("World", w)
-    # if cv2.waitKey(0) & 0xff == 27:
-    #     cv2.destroyAllWindows()
-
     # Get points
     path = []
     start_point = startPoint()
     goal_point = goalPoint()
+
+    # # Optimality
+    # opt = int(input('Enter optimality level from 0 - 3 (0 for no value):'))
 
     # Arrays for cost, parent
     cost_pq = PriorityQueue()
@@ -243,7 +241,7 @@ if __name__ == '__main__':
     # get final path
     path.append(goal_point)
     temp_path = backtrace(goal_point[0], goal_point[1])
-    print(len(temp_path))
+    # print(len(temp_path))
 
     w = 255 * w
     w = w.astype(np.uint8)
@@ -267,11 +265,12 @@ if __name__ == '__main__':
         rgb_w[int(cord[0]), int(cord[1]), :] = [255, 0, 0]
         cv2.imshow("Final Path", rgb_w)
         if count == len(temp_path):
+
+            # stop timer
+            temp_t = t
+            t = time.time()
+            print('Total Time: ', t - temp_t, 'sec')
+
             if cv2.waitKey(0) & 0xff == 27:
                 cv2.destroyAllWindows()
         cv2.waitKey(10)
-
-    # stop timer
-    temp_t = t
-    t = time.time()
-    print('Total Time: ', t - temp_t, 'sec')
