@@ -206,9 +206,6 @@ def backtrace(x, y):
 # main function
 if __name__ == '__main__':
 
-    # start timer
-    t = time.time()
-
     # generate world with obstacles
     w = world(200, 300)
     getMap(w)
@@ -217,6 +214,9 @@ if __name__ == '__main__':
     path = []
     start_point = startPoint()
     goal_point = goalPoint()
+
+    # start timer
+    t = time.time()
 
     # # Optimality
     # opt = int(input('Enter optimality level from 0 - 3 (0 for no value):'))
@@ -242,6 +242,11 @@ if __name__ == '__main__':
     path.append(goal_point)
     temp_path = backtrace(goal_point[0], goal_point[1])
     # print(len(temp_path))
+
+    # stop timer
+    temp_t = t
+    t = time.time()
+    print('Time taken by algorithm: ', t - temp_t, 'sec')
 
     w = 255 * w
     w = w.astype(np.uint8)
@@ -269,7 +274,7 @@ if __name__ == '__main__':
             # stop timer
             temp_t = t
             t = time.time()
-            print('Total Time: ', t - temp_t, 'sec')
+            print('Time for visualisation: ', t - temp_t, 'sec')
 
             if cv2.waitKey(0) & 0xff == 27:
                 cv2.destroyAllWindows()
