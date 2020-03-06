@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import math
-from queue import PriorityQueue
+from Queue import PriorityQueue
 import time
 
 
@@ -71,8 +71,6 @@ def getLineParam(x1, y1, x2, y2):
 
 
 def getMap(World):
-    # World = world(200, 300)
-
     points = [[200, 25, 225, 40, 0],
               [250, 25, 225, 40, 0],
               [250, 25, 225, 10, 1],
@@ -83,7 +81,6 @@ def getMap(World):
     for i in range(4):
         l = []
         a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
-        # print(a, b, c)
         l.append(a)
         l.append(b)
         l.append(c)
@@ -91,7 +88,6 @@ def getMap(World):
         lines.append(l)
 
     lines = np.asarray(lines)
-    # print(lines.shape)
 
     # Get obstacles for world
     obstacle(lines, 200, 250, 10, 40, World)
@@ -108,12 +104,10 @@ def getMap(World):
     for i in range(4):
         l = []
         a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
-        # print(a, b, c)
         l.append(a)
         l.append(b)
         l.append(c)
         l.append(points[i][4])
-        print(l)
         lines1.append(l)
 
     obstacle(lines1, 20, 50, 120, 185, World)
@@ -184,24 +178,25 @@ def getCostOfMove(cur, i, j):
 def explorer(costs, c_pq):
     while not c_pq.empty():
         top = c_pq.get()
-        x, y = top[0]
+        explored.append(top[1])
+        x, y = top[1]
+        if (x, y) == goal_point:
+            break
         for i in range(x - 1, x + 2):
             for j in range(y - 1, y + 2):
                 if 0 <= i < 200 and 0 <= j < 300:
-                    if w[i, j] == 1 and top[0] != (i, j):
-                        temp_cost = costs[top[0]] + getCostOfMove(top[0], i, j)
+                    if w[i, j] == 1 and top[1] != (i, j):
+                        temp_cost = costs[top[1]] + getCostOfMove(top[1], i, j)
                         if temp_cost < costs[i, j]:
-                            c_pq.put(((i, j), temp_cost))
-                            x1 = int(top[0][0])
-                            y1 = int(top[0][1])
+                            c_pq.put((temp_cost, (i, j)))
+                            x1 = int(top[1][0])
+                            y1 = int(top[1][1])
                             parent[i, j, :] = [x1, y1]
                             costs[i][j] = temp_cost
 
 
 # function to backtrace the path
 def backtrace(x, y):
-    print(x, y)
-    # print(parent[x, y, :])
     if parent[int(x), int(y), 0] == -1:
         return path
     else:
@@ -223,9 +218,6 @@ if __name__ == '__main__':
     # if cv2.waitKey(0) & 0xff == 27:
     #     cv2.destroyAllWindows()
 
-    # world map
-    # world = np.zeros(100)
-
     # Get points
     path = []
     start_point = startPoint()
@@ -242,16 +234,36 @@ if __name__ == '__main__':
             cost[i, j] = float('inf')
 
     cost[start_point] = 0
-    cost_pq.put((start_point, 0))
+    cost_pq.put((0, start_point))
 
     # let's explore
+    explored = []
     explorer(cost, cost_pq)
-    # print(parent)
 
     # get final path
     path.append(goal_point)
     temp_path = backtrace(goal_point[0], goal_point[1])
-    print(temp_path)
+    print(len(temp_path))
+
+    w = 255 * w
+    w = w.astype(np.uint8)
+
+    rgb_w = cv2.cvtColor(w, cv2.COLOR_GRAY2RGB)
+
+    for exp in explored:
+        cv2.circle(rgb_w, (int(exp[1]), int(exp[0])), 1, (0, 255, 0))
+        cv2.imshow("Explored region", rgb_w)
+        cv2.waitKey(1)
+
+    count = 1
+    for cord in temp_path:
+        count = count + 1
+        cv2.circle(rgb_w, (int(cord[1]), int(cord[0])), 1, (255, 0, 0))
+        cv2.imshow("Final Path", rgb_w)
+        if count == len(temp_path):
+            if cv2.waitKey(0) & 0xff == 27:
+                cv2.destroyAllWindows()
+        cv2.waitKey(10)
 
     # stop timer
     temp_t = t
