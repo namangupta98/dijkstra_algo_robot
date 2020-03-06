@@ -5,8 +5,6 @@ from queue import PriorityQueue
 import time
 
 
-# obstacle = 1
-
 def world(length, breadth):
     w = np.ones((length, breadth))
     return w
@@ -185,8 +183,8 @@ def explorer(costs, c_pq):
     while not c_pq.empty():
         top = c_pq.get()
         x, y = top[0]
-        for i in range(x - 1, x + 2):
-            for j in range(y - 1, y + 2):
+        for i in range(x-1-r-c, x+2+r+c):
+            for j in range(y-1-r-c, y+2+r+c):
                 if 0 <= i < 200 and 0 <= j < 300:
                     if w[i, j] == 1 and top[0] != (i, j):
                         temp_cost = costs[top[0]] + getCostOfMove(top[0], i, j)
@@ -201,7 +199,6 @@ def explorer(costs, c_pq):
 # function to backtrace the path
 def backtrace(x, y):
     print(x, y)
-    # print(parent[x, y, :])
     if parent[int(x), int(y), 0] == -1:
         return path
     else:
@@ -215,20 +212,20 @@ if __name__ == '__main__':
     # start timer
     t = time.time()
 
+    # generate world with obstacles
     w = world(200, 300)
     getMap(w)
-
-    # cv2.imshow("World", w)
-    # if cv2.waitKey(0) & 0xff == 27:
-    #     cv2.destroyAllWindows()
-
-    # world map
-    # world = np.zeros(100)
 
     # Get points
     path = []
     start_point = startPoint()
     goal_point = goalPoint()
+
+    # get robot radius
+    r = int(input('Enter robot radius: '))
+
+    # get clearance
+    c = int(input('Enter clearance: '))
 
     # Arrays for cost, parent
     cost_pq = PriorityQueue()
@@ -245,7 +242,6 @@ if __name__ == '__main__':
 
     # let's explore
     explorer(cost, cost_pq)
-    # print(parent)
 
     # get final path
     path.append(goal_point)
