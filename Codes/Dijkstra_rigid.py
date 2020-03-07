@@ -30,6 +30,7 @@ lines[3] - defines which part of the half plane should be included in the obstac
 def obstacle(lines, xmin, xmax, ymin, ymax, w):
     for i in range(ymin, ymax + 1):
         for j in range(xmin, xmax + 1):
+            temp = w[i][j]
             # print(str(i) + ", " + str(j) + ":")
             for l in lines:
                 # print(l[0] * j + l[1] * i + l[2])
@@ -38,14 +39,14 @@ def obstacle(lines, xmin, xmax, ymin, ymax, w):
                     if l[0] * j + l[1] * i + l[2] >= 0:
                         w[i][j] = 0
                     else:
-                        w[i][j] = 1
+                        w[i][j] = temp
                         break
 
                 elif l[3] == 0:
                     if l[0] * j + l[1] * i + l[2] <= 0:
                         w[i][j] = 0
                     else:
-                        w[i][j] = 1
+                        w[i][j] = temp
                         break
 
 
@@ -143,18 +144,39 @@ def getMap(World):
     obstacle(lines1, 31, 100, 30, 77, World)
 
 
+def getLineParam_rigid(x1, y1, x2, y2, d):
+    if x2 - x1 == 0:
+        if d == 0:
+            return 1, 0, -x1 - thresh
+        else:
+            return 1, 0, -x1 + thresh
+    else:
+        a = float(y2 - y1) / float(x2 - x1)
+    b = -1
+    th = thresh * math.sqrt(1 + a**2)
+    if d == 0:
+        c = y1 - a * x1 + th
+    else:
+        c = y1 - a * x1 - th
+    # c = y1 - a * x1
+
+    # print(a)
+
+    return -a, -b, -c
+
+
 def getMap_rigid(World):
 
-    points = [[200-thresh, 25, 225, 40+thresh, 0],
-              [250+thresh, 25, 225, 40+thresh, 0],
-              [250+thresh, 25, 225, 10-thresh, 1],
-              [200-thresh, 25, 225, 10-thresh, 1]]
+    points = [[200, 25, 225, 40, 0],
+              [250, 25, 225, 40, 0],
+              [250, 25, 225, 10, 1],
+              [200, 25, 225, 10, 1]]
 
     # Get a, b, c values for every lines
     lines = []
     for i in range(4):
         l = []
-        a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
+        a, b, c = getLineParam_rigid(points[i][0], points[i][1], points[i][2], points[i][3], points[i][4])
         l.append(a)
         l.append(b)
         l.append(c)
@@ -164,30 +186,30 @@ def getMap_rigid(World):
     lines = np.asarray(lines)
 
     # Get obstacles for world
-    obstacle(lines, 200-thresh, 250+thresh, 10-thresh, 40+thresh, World)
+    obstacle(lines, max(200-2*thresh, 0), min(250+2*thresh, 299), max(10-2*thresh, 0), min(40+2*thresh, 199), World)
     circle_obstacle(150, 100, 40+thresh, 20+thresh, 1, World)
     circle_obstacle(225, 150, 1, 1, 25+thresh, World)
 
-    points = [[25-thresh, 185+thresh, 50+thresh, 185+thresh, 0],
-              [50+thresh, 185+thresh, 50+thresh, 150-thresh, 0],
-              [50+thresh, 150-thresh, 20-thresh, 120-thresh, 1],
-              [20-thresh, 120-thresh, 25-thresh, 185+thresh, 0]]
+    points = [[25, 185, 50, 185, 0],
+              [50, 185, 50, 150, 0],
+              [50, 150, 20, 120, 1],
+              [20, 120, 25, 185, 0]]
 
     # Get a, b, c values for every lines
     lines1 = []
     for i in range(4):
         l = []
-        a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
+        a, b, c = getLineParam_rigid(points[i][0], points[i][1], points[i][2], points[i][3], points[i][4])
         l.append(a)
         l.append(b)
         l.append(c)
         l.append(points[i][4])
         lines1.append(l)
 
-    obstacle(lines1, max(20-thresh, 0), 50+thresh, 120-thresh, min(185+thresh, 199), World)
+    obstacle(lines1, max(20-2*thresh, 0), min(50+2*thresh, 299), max(120-2*thresh, 0), min(185+2*thresh, 199), World)
 
-    points = [[50-thresh, 185+thresh, 75+thresh, 185+thresh, 0],
-              [75+thresh, 185+thresh, 100+thresh, 150, 0],
+    points = [[50, 185, 75, 185, 0],
+              [75, 185, 100, 150, 0],
               [100, 150, 75, 120, 1],
               [75, 120, 50, 150, 1],
               [50, 150, 50, 185, 1]]
@@ -196,14 +218,14 @@ def getMap_rigid(World):
     lines1 = []
     for i in range(4):
         l = []
-        a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
+        a, b, c = getLineParam_rigid(points[i][0], points[i][1], points[i][2], points[i][3], points[i][4])
         l.append(a)
         l.append(b)
         l.append(c)
         l.append(points[i][4])
         lines1.append(l)
 
-    obstacle(lines1, 50, 100, 120, 185, World)
+    obstacle(lines1, max(50-2*thresh, 0), min(100+2*thresh, 299), max(120-2*thresh, 0), min(185+2*thresh, 199), World)
 
     points = [[36, 77, 100, 39, 0],
               [100, 39, 95, 30, 1],
@@ -214,14 +236,14 @@ def getMap_rigid(World):
     lines1 = []
     for i in range(4):
         l = []
-        a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
+        a, b, c = getLineParam_rigid(points[i][0], points[i][1], points[i][2], points[i][3], points[i][4])
         l.append(a)
         l.append(b)
         l.append(c)
         l.append(points[i][4])
         lines1.append(l)
 
-    obstacle(lines1, 31, 100, 30, 77, World)
+    obstacle(lines1, max(31-2*thresh, 0), min(100+2*thresh, 299), max(30-2*thresh, 0), min(77+2*thresh, 199), World)
 
 
 # function to get start points
@@ -301,70 +323,71 @@ if __name__ == '__main__':
     old_w = world(200, 300)
     getMap(old_w)
 
-    cv2.imshow('world', w)
-    cv2.imshow('old_world', old_w)
-    cv2.waitKey(0)
+    # cv2.imshow('world', w)
+    # cv2.imshow('old_world', old_w)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
-    # # start timer
-    # t = time.time()
-    #
-    # # Arrays for cost, parent
-    # cost_pq = PriorityQueue()
-    # parent = np.zeros((200, 300, 2))
-    # cost = np.empty_like(w)
-    #
-    # for i in range(w.shape[0]):
-    #     for j in range(w.shape[1]):
-    #         parent[i, j, :] = [-1, -1]
-    #         cost[i, j] = float('inf')
-    #
-    # cost[start_point] = 0
-    # cost_pq.put((0, start_point))
-    #
-    # # let's explore
-    # explored = []
-    # explorer(cost, cost_pq)
-    #
-    # # get final path
-    # path.append(goal_point)
-    # temp_path = backtrace(goal_point[0], goal_point[1])
-    # # print(temp_path)
-    #
-    # # stop timer
-    # temp_t = t
-    # t = time.time()
-    # print('Time taken by algorithm: ', t - temp_t, 'sec')
-    #
-    # w = 255 * w
-    # w = w.astype(np.uint8)
-    #
-    # rgb_w = cv2.cvtColor(w, cv2.COLOR_GRAY2RGB)
-    #
-    # count = 1
-    # for exp in explored:
-    #     count = count + 1
-    #     # cv2.circle(rgb_w, (int(exp[1]), int(exp[0])), 1, (0, 255, 0))
-    #     rgb_w[int(exp[0]), int(exp[1]), :] = [0, 255, 0]
-    #     cv2.imshow("Explored region", rgb_w)
-    #     cv2.waitKey(1)
-    #     if count == len(explored):
-    #         cv2.destroyAllWindows()
-    #
-    # count = 1
-    # for cord in temp_path:
-    #     count = count + 1
-    #     # cv2.circle(rgb_w, (int(cord[1]), int(cord[0])), 1, (255, 0, 0))
-    #     rgb_w[int(cord[0]), int(cord[1]), :] = [255, 0, 0]
-    #     cv2.imshow("Final Path", rgb_w)
-    #     if count == len(temp_path):
-    #
-    #         # stop timer
-    #         temp_t = t
-    #         t = time.time()
-    #         print('Time for visualisation: ', t - temp_t, 'sec')
-    #
-    #         if cv2.waitKey(0) & 0xff == 27:
-    #             cv2.destroyAllWindows()
-    #     cv2.waitKey(10)
+    # start timer
+    t = time.time()
+
+    # Arrays for cost, parent
+    cost_pq = PriorityQueue()
+    parent = np.zeros((200, 300, 2))
+    cost = np.empty_like(w)
+
+    for i in range(w.shape[0]):
+        for j in range(w.shape[1]):
+            parent[i, j, :] = [-1, -1]
+            cost[i, j] = float('inf')
+
+    cost[start_point] = 0
+    cost_pq.put((0, start_point))
+
+    # let's explore
+    explored = []
+    explorer(cost, cost_pq)
+
+    # get final path
+    path.append(goal_point)
+    temp_path = backtrace(goal_point[0], goal_point[1])
+    # print(temp_path)
+
+    # stop timer
+    temp_t = t
+    t = time.time()
+    print('Time taken by algorithm: ', t - temp_t, 'sec')
+
+    old_w = 255 * old_w
+    old_w = old_w.astype(np.uint8)
+
+    rgb_w = cv2.cvtColor(old_w, cv2.COLOR_GRAY2RGB)
+
+    count = 1
+    for exp in explored:
+        count = count + 1
+        # cv2.circle(rgb_w, (int(exp[1]), int(exp[0])), 1, (0, 255, 0))
+        rgb_w[int(exp[0]), int(exp[1]), :] = [0, 255, 0]
+        cv2.imshow("Explored region", rgb_w)
+        cv2.waitKey(1)
+        if count == len(explored):
+            cv2.destroyAllWindows()
+
+    count = 1
+    for cord in temp_path:
+        count = count + 1
+        # cv2.circle(rgb_w, (int(cord[1]), int(cord[0])), 1, (255, 0, 0))
+        rgb_w[int(cord[0]), int(cord[1]), :] = [255, 0, 0]
+        cv2.imshow("Final Path", rgb_w)
+        if count == len(temp_path):
+
+            # stop timer
+            temp_t = t
+            t = time.time()
+            print('Time for visualisation: ', t - temp_t, 'sec')
+
+            if cv2.waitKey(0) & 0xff == 27:
+                cv2.destroyAllWindows()
+        cv2.waitKey(10)
 
 
