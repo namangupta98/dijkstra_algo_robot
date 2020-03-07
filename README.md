@@ -23,6 +23,6 @@ python3 Dijkstra_rigid.py
 
 Keeping start point as (5, 5) and goal point as (195, 295)
 
-- Algorithm time for point robot: 1.6 seconds and visualization time for point robot: 85 seconds
+- Algorithm time for point robot: 1.2 seconds and visualization time for point robot: 85 seconds
 
-- Algorithm time for rigid robot: 1.6 seconds and visualization time for rigid robot: 85 seconds
+- Algorithm time for rigid robot: 1.2 seconds and visualization time for rigid robot: 74 seconds
