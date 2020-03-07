@@ -10,12 +10,6 @@ def world(length, breadth):
     return w
 
 
-def square_obstacle(x, y, length, w):
-    for j in range(x, x + length):
-        for i in range(y, y + length):
-            w[i][j] = 0
-
-
 def circle_obstacle(x, y, a, b, radius, w):
     for j in range(x - a * radius, x + a * radius):
         for i in range(y - b * radius, y + b * radius):
@@ -69,7 +63,6 @@ def getLineParam(x1, y1, x2, y2):
 
 
 def getMap(World):
-    # World = world(200, 300)
 
     points = [[200, 25, 225, 40, 0],
               [250, 25, 225, 40, 0],
@@ -81,7 +74,6 @@ def getMap(World):
     for i in range(4):
         l = []
         a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
-        # print(a, b, c)
         l.append(a)
         l.append(b)
         l.append(c)
@@ -89,7 +81,6 @@ def getMap(World):
         lines.append(l)
 
     lines = np.asarray(lines)
-    # print(lines.shape)
 
     # Get obstacles for world
     obstacle(lines, 200, 250, 10, 40, World)
@@ -106,18 +97,97 @@ def getMap(World):
     for i in range(4):
         l = []
         a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
-        # print(a, b, c)
         l.append(a)
         l.append(b)
         l.append(c)
         l.append(points[i][4])
-        print(l)
         lines1.append(l)
 
     obstacle(lines1, 20, 50, 120, 185, World)
 
     points = [[50, 185, 75, 185, 0],
               [75, 185, 100, 150, 0],
+              [100, 150, 75, 120, 1],
+              [75, 120, 50, 150, 1],
+              [50, 150, 50, 185, 1]]
+
+    # Get a, b, c values for every lines
+    lines1 = []
+    for i in range(4):
+        l = []
+        a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
+        l.append(a)
+        l.append(b)
+        l.append(c)
+        l.append(points[i][4])
+        lines1.append(l)
+
+    obstacle(lines1, 50, 100, 120, 185, World)
+
+    points = [[36, 77, 100, 39, 0],
+              [100, 39, 95, 30, 1],
+              [95, 30, 31, 68, 1],
+              [31, 68, 36, 76, 0]]
+
+    # Get a, b, c values for every lines
+    lines1 = []
+    for i in range(4):
+        l = []
+        a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
+        l.append(a)
+        l.append(b)
+        l.append(c)
+        l.append(points[i][4])
+        lines1.append(l)
+
+    obstacle(lines1, 31, 100, 30, 77, World)
+
+
+def getMap_rigid(World):
+
+    points = [[200-thresh, 25, 225, 40+thresh, 0],
+              [250+thresh, 25, 225, 40+thresh, 0],
+              [250+thresh, 25, 225, 10-thresh, 1],
+              [200-thresh, 25, 225, 10-thresh, 1]]
+
+    # Get a, b, c values for every lines
+    lines = []
+    for i in range(4):
+        l = []
+        a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
+        l.append(a)
+        l.append(b)
+        l.append(c)
+        l.append(points[i][4])
+        lines.append(l)
+
+    lines = np.asarray(lines)
+
+    # Get obstacles for world
+    obstacle(lines, 200-thresh, 250+thresh, 10-thresh, 40+thresh, World)
+    circle_obstacle(150, 100, 40+thresh, 20+thresh, 1, World)
+    circle_obstacle(225, 150, 1, 1, 25+thresh, World)
+
+    points = [[25-thresh, 185+thresh, 50+thresh, 185+thresh, 0],
+              [50+thresh, 185+thresh, 50+thresh, 150-thresh, 0],
+              [50+thresh, 150-thresh, 20-thresh, 120-thresh, 1],
+              [20-thresh, 120-thresh, 25-thresh, 185+thresh, 0]]
+
+    # Get a, b, c values for every lines
+    lines1 = []
+    for i in range(4):
+        l = []
+        a, b, c = getLineParam(points[i][0], points[i][1], points[i][2], points[i][3])
+        l.append(a)
+        l.append(b)
+        l.append(c)
+        l.append(points[i][4])
+        lines1.append(l)
+
+    obstacle(lines1, max(20-thresh, 0), 50+thresh, 120-thresh, min(185+thresh, 199), World)
+
+    points = [[50-thresh, 185+thresh, 75+thresh, 185+thresh, 0],
+              [75+thresh, 185+thresh, 100+thresh, 150, 0],
               [100, 150, 75, 120, 1],
               [75, 120, 50, 150, 1],
               [50, 150, 50, 185, 1]]
@@ -182,23 +252,25 @@ def getCostOfMove(cur, i, j):
 def explorer(costs, c_pq):
     while not c_pq.empty():
         top = c_pq.get()
-        x, y = top[0]
-        for i in range(x-1-r-c, x+2+r+c):
-            for j in range(y-1-r-c, y+2+r+c):
+        explored.append(top[1])
+        x, y = top[1]
+        if (x, y) == goal_point:
+            break
+        for i in range(x-1, x+2):
+            for j in range(y-1, y+2):
                 if 0 <= i < 200 and 0 <= j < 300:
-                    if w[i, j] == 1 and top[0] != (i, j):
-                        temp_cost = costs[top[0]] + getCostOfMove(top[0], i, j)
+                    if w[i, j] == 1 and top[1] != (i, j):
+                        temp_cost = costs[top[1]] + getCostOfMove(top[1], i, j)
                         if temp_cost < costs[i, j]:
-                            c_pq.put(((i, j), temp_cost))
-                            x1 = int(top[0][0])
-                            y1 = int(top[0][1])
+                            c_pq.put((temp_cost, (i, j)))
+                            x1 = int(top[1][0])
+                            y1 = int(top[1][1])
                             parent[i, j, :] = [x1, y1]
                             costs[i][j] = temp_cost
 
 
 # function to backtrace the path
 def backtrace(x, y):
-    print(x, y)
     if parent[int(x), int(y), 0] == -1:
         return path
     else:
@@ -208,13 +280,6 @@ def backtrace(x, y):
 
 # main function
 if __name__ == '__main__':
-
-    # start timer
-    t = time.time()
-
-    # generate world with obstacles
-    w = world(200, 300)
-    getMap(w)
 
     # Get points
     path = []
@@ -227,28 +292,79 @@ if __name__ == '__main__':
     # get clearance
     c = int(input('Enter clearance: '))
 
-    # Arrays for cost, parent
-    cost_pq = PriorityQueue()
-    parent = np.zeros((200, 300, 2))
-    cost = np.empty_like(w)
+    thresh = r+c
 
-    for i in range(w.shape[0]):
-        for j in range(w.shape[1]):
-            parent[i, j, :] = [-1, -1]
-            cost[i, j] = float('inf')
+    # generate world with obstacles
+    w = world(200, 300)
+    getMap_rigid(w)
 
-    cost[start_point] = 0
-    cost_pq.put((start_point, 0))
+    old_w = world(200, 300)
+    getMap(old_w)
 
-    # let's explore
-    explorer(cost, cost_pq)
+    cv2.imshow('world', w)
+    cv2.imshow('old_world', old_w)
+    cv2.waitKey(0)
 
-    # get final path
-    path.append(goal_point)
-    temp_path = backtrace(goal_point[0], goal_point[1])
-    print(temp_path)
+    # # start timer
+    # t = time.time()
+    #
+    # # Arrays for cost, parent
+    # cost_pq = PriorityQueue()
+    # parent = np.zeros((200, 300, 2))
+    # cost = np.empty_like(w)
+    #
+    # for i in range(w.shape[0]):
+    #     for j in range(w.shape[1]):
+    #         parent[i, j, :] = [-1, -1]
+    #         cost[i, j] = float('inf')
+    #
+    # cost[start_point] = 0
+    # cost_pq.put((0, start_point))
+    #
+    # # let's explore
+    # explored = []
+    # explorer(cost, cost_pq)
+    #
+    # # get final path
+    # path.append(goal_point)
+    # temp_path = backtrace(goal_point[0], goal_point[1])
+    # # print(temp_path)
+    #
+    # # stop timer
+    # temp_t = t
+    # t = time.time()
+    # print('Time taken by algorithm: ', t - temp_t, 'sec')
+    #
+    # w = 255 * w
+    # w = w.astype(np.uint8)
+    #
+    # rgb_w = cv2.cvtColor(w, cv2.COLOR_GRAY2RGB)
+    #
+    # count = 1
+    # for exp in explored:
+    #     count = count + 1
+    #     # cv2.circle(rgb_w, (int(exp[1]), int(exp[0])), 1, (0, 255, 0))
+    #     rgb_w[int(exp[0]), int(exp[1]), :] = [0, 255, 0]
+    #     cv2.imshow("Explored region", rgb_w)
+    #     cv2.waitKey(1)
+    #     if count == len(explored):
+    #         cv2.destroyAllWindows()
+    #
+    # count = 1
+    # for cord in temp_path:
+    #     count = count + 1
+    #     # cv2.circle(rgb_w, (int(cord[1]), int(cord[0])), 1, (255, 0, 0))
+    #     rgb_w[int(cord[0]), int(cord[1]), :] = [255, 0, 0]
+    #     cv2.imshow("Final Path", rgb_w)
+    #     if count == len(temp_path):
+    #
+    #         # stop timer
+    #         temp_t = t
+    #         t = time.time()
+    #         print('Time for visualisation: ', t - temp_t, 'sec')
+    #
+    #         if cv2.waitKey(0) & 0xff == 27:
+    #             cv2.destroyAllWindows()
+    #     cv2.waitKey(10)
 
-    # stop timer
-    temp_t = t
-    t = time.time()
-    print('Total Time: ', t - temp_t, 'sec')
+
