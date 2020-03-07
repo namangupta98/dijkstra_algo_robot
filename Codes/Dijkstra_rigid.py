@@ -186,7 +186,7 @@ def getMap_rigid(World):
     lines = np.asarray(lines)
 
     # Get obstacles for world
-    obstacle(lines, max(200-2*thresh, 0), min(250+2*thresh, 299), max(10-2*thresh, 0), min(40+2*thresh, 199), World)
+    obstacle(lines, max(200-3*thresh, 0), min(250+3*thresh, 299), max(10-3*thresh, 0), min(40+3*thresh, 199), World)
     circle_obstacle(150, 100, 40+thresh, 20+thresh, 1, World)
     circle_obstacle(225, 150, 1, 1, 25+thresh, World)
 
@@ -206,7 +206,7 @@ def getMap_rigid(World):
         l.append(points[i][4])
         lines1.append(l)
 
-    obstacle(lines1, max(20-2*thresh, 0), min(50+2*thresh, 299), max(120-2*thresh, 0), min(185+2*thresh, 199), World)
+    obstacle(lines1, max(20-3*thresh, 0), min(50+3*thresh, 299), max(120-3*thresh, 0), min(185+3*thresh, 199), World)
 
     points = [[50, 185, 75, 185, 0],
               [75, 185, 100, 150, 0],
@@ -225,7 +225,7 @@ def getMap_rigid(World):
         l.append(points[i][4])
         lines1.append(l)
 
-    obstacle(lines1, max(50-2*thresh, 0), min(100+2*thresh, 299), max(120-2*thresh, 0), min(185+2*thresh, 199), World)
+    obstacle(lines1, max(50-3*thresh, 0), min(100+3*thresh, 299), max(120-3*thresh, 0), min(185+3*thresh, 199), World)
 
     points = [[36, 77, 100, 39, 0],
               [100, 39, 95, 30, 1],
@@ -243,24 +243,24 @@ def getMap_rigid(World):
         l.append(points[i][4])
         lines1.append(l)
 
-    obstacle(lines1, max(31-2*thresh, 0), min(100+2*thresh, 299), max(30-2*thresh, 0), min(77+2*thresh, 199), World)
+    obstacle(lines1, max(31-3*thresh, 0), min(100+3*thresh, 299), max(30-3*thresh, 0), min(77+3*thresh, 199), World)
 
 
 # function to get start points
 def startPoint():
-    # sx = int(input('Enter x coordinate for start point: '))
-    # sy = int(input('Enter y coordinate for start point: '))
-    sx = 5
-    sy = 5
+    sx = int(input('Enter x coordinate for start point: '))
+    sy = int(input('Enter y coordinate for start point: '))
+    # sx = 5
+    # sy = 5
     return sx, sy
 
 
 # function to get goal points
 def goalPoint():
-    # gx = int(input('Enter x coordinate for goal point: '))
-    # gy = int(input('Enter y coordinate for goal point: '))
-    gx = 195
-    gy = 295
+    gx = int(input('Enter x coordinate for goal point: '))
+    gy = int(input('Enter y coordinate for goal point: '))
+    # gx = 195
+    # gy = 295
     return gx, gy
 
 
@@ -314,19 +314,26 @@ if __name__ == '__main__':
     # get clearance
     c = int(input('Enter clearance: '))
 
+    # threshold
     thresh = r+c
 
-    # generate world with obstacles
+    # generate rigid world with obstacles
     w = world(200, 300)
     getMap_rigid(w)
 
+    # original world
     old_w = world(200, 300)
     getMap(old_w)
 
-    # cv2.imshow('world', w)
-    # cv2.imshow('old_world', old_w)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    # check goal_point lies on obstacle
+    if not w[goal_point]:
+        print('Goal Point lies on obstacle !!')
+        exit()
+
+    # check start point lies on obstacle
+    if not w[start_point]:
+        print('Start Point lies on obstacle !!')
+        exit()
 
     # start timer
     t = time.time()
@@ -336,6 +343,7 @@ if __name__ == '__main__':
     parent = np.zeros((200, 300, 2))
     cost = np.empty_like(w)
 
+    # create empty parent and cost array
     for i in range(w.shape[0]):
         for j in range(w.shape[1]):
             parent[i, j, :] = [-1, -1]
@@ -358,16 +366,21 @@ if __name__ == '__main__':
     t = time.time()
     print('Time taken by algorithm: ', t - temp_t, 'sec')
 
+    # entering in colorful world
     old_w = 255 * old_w
     old_w = old_w.astype(np.uint8)
 
     rgb_w = cv2.cvtColor(old_w, cv2.COLOR_GRAY2RGB)
 
+    rgb_w = cv2.flip(rgb_w, 0)
+    m, n, _ = rgb_w.shape
+
+    # display animation
     count = 1
     for exp in explored:
         count = count + 1
         # cv2.circle(rgb_w, (int(exp[1]), int(exp[0])), 1, (0, 255, 0))
-        rgb_w[int(exp[0]), int(exp[1]), :] = [0, 255, 0]
+        rgb_w[m-int(exp[0])-1, int(exp[1]), :] = [0, 255, 0]
         cv2.imshow("Explored region", rgb_w)
         cv2.waitKey(1)
         if count == len(explored):
@@ -376,8 +389,8 @@ if __name__ == '__main__':
     count = 1
     for cord in temp_path:
         count = count + 1
-        # cv2.circle(rgb_w, (int(cord[1]), int(cord[0])), 1, (255, 0, 0))
-        rgb_w[int(cord[0]), int(cord[1]), :] = [255, 0, 0]
+        cv2.circle(rgb_w, (int(cord[1]), m-int(cord[0])-1), r, (255, 0, 0))
+        # rgb_w[int(cord[0]), int(cord[1]), :] = [255, 0, 0]
         cv2.imshow("Final Path", rgb_w)
         if count == len(temp_path):
 
