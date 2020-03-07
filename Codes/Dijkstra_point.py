@@ -274,7 +274,8 @@ if __name__ == '__main__':
             cv2.destroyAllWindows()
 
     count = 1
-    for cord in temp_path:
+    tem_path = temp_path[::-1]
+    for cord in tem_path:
         count = count + 1
         # cv2.circle(rgb_w, (int(cord[1]), m - int(cord[0]) - 1), r, (255, 0, 0))
         rgb_w[m-int(cord[0])-1, int(cord[1]), :] = [255, 0, 0]
