@@ -215,11 +215,18 @@ if __name__ == '__main__':
     start_point = startPoint()
     goal_point = goalPoint()
 
+    # check goal_point lies on obstacle
+    if not w[goal_point]:
+        print('Goal Point lies on obstacle !!')
+        exit()
+
+    # check start point lies on obstacle
+    if not w[start_point]:
+        print('Start Point lies on obstacle !!')
+        exit()
+
     # start timer
     t = time.time()
-
-    # # Optimality
-    # opt = int(input('Enter optimality level from 0 - 3 (0 for no value):'))
 
     # Arrays for cost, parent
     cost_pq = PriorityQueue()
@@ -253,11 +260,14 @@ if __name__ == '__main__':
 
     rgb_w = cv2.cvtColor(w, cv2.COLOR_GRAY2RGB)
 
+    rgb_w = cv2.flip(rgb_w, 0)
+    m, n, _ = rgb_w.shape
+
     count = 1
     for exp in explored:
         count = count + 1
         # cv2.circle(rgb_w, (int(exp[1]), int(exp[0])), 1, (0, 255, 0))
-        rgb_w[int(exp[0]), int(exp[1]), :] = [0, 255, 0]
+        rgb_w[m - int(exp[0]) - 1, int(exp[1]), :] = [0, 255, 0]
         cv2.imshow("Explored region", rgb_w)
         cv2.waitKey(1)
         if count == len(explored):
@@ -266,8 +276,8 @@ if __name__ == '__main__':
     count = 1
     for cord in temp_path:
         count = count + 1
-        # cv2.circle(rgb_w, (int(cord[1]), int(cord[0])), 1, (255, 0, 0))
-        rgb_w[int(cord[0]), int(cord[1]), :] = [255, 0, 0]
+        # cv2.circle(rgb_w, (int(cord[1]), m - int(cord[0]) - 1), r, (255, 0, 0))
+        rgb_w[m-int(cord[0])-1, int(cord[1]), :] = [255, 0, 0]
         cv2.imshow("Final Path", rgb_w)
         if count == len(temp_path):
 
