@@ -25,4 +25,14 @@ Keeping start point as (5, 5) and goal point as (195, 295)
 
 - Algorithm time for point robot: 1.2 seconds and visualization time for point robot: 85 seconds
 
+  <p align="center">
+    <img src="https://github.com/namangupta98/dijkstra_algo_robot/blob/master/Output/Dijkstra-Point-fast.gif"><br \>
+    <b>Figure 1 - Point Robot</b>
+  </p>
+
 - Algorithm time for rigid robot: 1.2 seconds and visualization time for rigid robot: 74 seconds
+
+  <p align="center">
+    <img src="https://github.com/namangupta98/dijkstra_algo_robot/blob/master/Output/Dijkstra-Rigid-fast.gif"><br \>
+    <b>Figure 2 - Rigid Robot with Radius=2 and Clearance=1</b>
+  </p>
