@@ -1,4 +1,7 @@
 # Dijkstra's Algorithm for Point and Rigid Robot
+Coursework project for ENPM661: Planning for Autonomous Robots.
+## Overview
+The aim is to navigate a point robot and a rigid robot from start point to goal point using Dijkstra's algorithm in a known environment.
 
 ## Dependencies
 
